@@ -1,3 +1,5 @@
+'use strict';
+
 require('dotenv').config();
 const ReactRefreshPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -9,17 +11,6 @@ const isDevelopment = process.env.NODE_ENV !== 'production';
 module.exports = {
     mode: isDevelopment ? 'development' : 'production',
     devtool: 'source-map',
-    devServer: {
-      port: 8080,
-      open: true,
-      compress: true,
-      static: {
-        directory: path.join(__dirname, 'public'),
-      },
-      hot:true,
-      liveReload: true,
-      watchFiles: ['src/**/*.js','public/**/*'],
-    },
     entry: {
       main: './src/index.js',
     },
@@ -42,6 +33,24 @@ module.exports = {
             }
           }
         ]
+    },
+    devServer: {
+      port: 8080,
+      open: true,
+      compress: true,
+      static: {
+        directory: path.join(__dirname, 'public'),
+      },
+      hot: isDevelopment ? true : false,
+      liveReload: isDevelopment ? true : false,
+      watchFiles: ['src/**/*.js','public/**/*'],
+      client: {
+        overlay: {
+          errors: true,
+          warnings: false,
+          runtimeErrors: true,
+        },
+      }
     },
     plugins: [
                 isDevelopment && new ReactRefreshPlugin(),
