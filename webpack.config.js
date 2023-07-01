@@ -1,11 +1,28 @@
-'use strict'
+require('dotenv').config();
+const ReactRefreshPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const path = require("path");
 
+const isDevelopment = process.env.NODE_ENV !== 'production';
+
 module.exports = {
-    mode: 'development',
+    mode: isDevelopment ? 'development' : 'production',
     devtool: 'source-map',
-    entry: path.join(__dirname, 'src', 'index'),
+    devServer: {
+      port: 8080,
+      open: true,
+      compress: true,
+      static: {
+        directory: path.join(__dirname, 'public'),
+      },
+      hot:true,
+      liveReload: true,
+      watchFiles: ['src/**/*.js','public/**/*'],
+    },
+    entry: {
+      main: './src/index.js',
+    },
     output: {
         filename: 'bundle.js',
         path: path.join(__dirname, 'public', 'dist'),
@@ -14,9 +31,9 @@ module.exports = {
     module: {
         rules: [
           {
-            test: /\.m?js$/,
+            test: /\.[jt]sx?$/,
             exclude: /node_modules/,
-            include: /src/,
+            include: path.join(__dirname, 'src'),
             use: {
               loader: "babel-loader",
               options: {
@@ -26,12 +43,14 @@ module.exports = {
           }
         ]
     },
-    devServer: {
-        static: {
-            directory: path.join(__dirname, 'public'),
-        },
-        compress: true,
-        port: 8080,
-        hot: true,
-    }
+    plugins: [
+                isDevelopment && new ReactRefreshPlugin(),
+                new HtmlWebpackPlugin({
+                  filename: './index.html',
+                  template: './public/index.html',
+                }),
+              ].filter(Boolean),
+    resolve: {
+      extensions: ['.js', '.jsx'],
+    },
 }
